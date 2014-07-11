@@ -1,0 +1,22 @@
+html {
+  background-color: gray;
+  width: 100%;
+  text-align: center;
+}
+
+canvas {
+  background-color: #6666FF;
+  margin: 0 auto;
+}
+
+#log {
+  width:20%;
+  height: 200px;
+  background-color: white;
+  float: left;
+  overflow: scroll;
+  margin-top: 120px;
+}
+.clear {
+  clear: both;
+}
