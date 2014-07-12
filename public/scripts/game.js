@@ -17,17 +17,20 @@ Board.prototype.clear = function(){
   this.graphics.ctx.clearRect(0,0, 320*3,200*3);
 };
 
-var Game = function(graphics, board, player){
+var Game = function(graphics, board, player, hud){
   this.graphics = graphics;
   this.board = board;
   this.player = player;
+  this.hud = hud;
   this.meter = new FPSMeter({decimals: 0});
   this.step = 0.01;
   window.addEventListener('keyup', function(event) {
     Key.onKeyup(event);
+	event.preventDefault();
   }, false);
   window.addEventListener('keydown', function(event) {
     Key.onKeydown(event);
+	event.preventDefault();
   }, false);
 };
 
@@ -38,6 +41,7 @@ Game.prototype.timestamp = function(){
 
 Game.prototype.render = function(){
   this.meter.tick();
+  this.hud.updateTimer();
   this.board.clear();
   this.board.draw();
   this.player.tail.draw();
@@ -81,7 +85,8 @@ var graphics = new Graphics();
 var board = new Board(200, 160, graphics);
 var tail = new Tail(160, 199, graphics);
 var player = new Player(160*3, 199*3,graphics, tail);
-var game = new Game(graphics, board, player);
 var hud = new Hud();
+var game = new Game(graphics, board, player, hud);
+
 game.run();
 
