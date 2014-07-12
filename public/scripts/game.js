@@ -30,7 +30,16 @@ var Game = function(graphics, board, player, hud){
   }, false);
   window.addEventListener('keydown', function(event) {
     Key.onKeydown(event);
-	event.preventDefault();
+
+	// Block only arrow keys.
+    switch(event.keyCode) {
+    case 37: // left
+    case 38: // up
+    case 39: // right
+    case 40: // down
+	  event.preventDefault();
+    }
+
   }, false);
 };
 
