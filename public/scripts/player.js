@@ -16,7 +16,7 @@ Tail.prototype.draw = function(){
   var points = JSON.parse( JSON.stringify( this.points ) );
   var last = points.shift();
   points.forEach(function(el, index){
-    graphics.line(last.x, last.y, el.x, el.y, Board.CELLS.tail);
+    graphics.line(last.x/3, last.y/3, el.x/3, el.y/3, Board.CELLS.tail);
     last = el;
   });
 };
@@ -45,7 +45,12 @@ Player.prototype.yGrid = function(){
 };
 
 Player.prototype.tailUpdate = function(){
-  this.tail.points.push({x: Math.floor(this.x/3), y: Math.floor(this.y/3)});
+  this.tail.points.push({x: Math.floor(this.x), y: Math.floor(this.y)});
+};
+
+Player.prototype.log = function(id, msg){
+  var el = document.getElementById(id);
+  el.innerHTML = "<pre>" + JSON.stringify(msg) + "</pre>";
 };
 
 Player.prototype.update = function(deltaTime){
@@ -71,7 +76,8 @@ Player.prototype.update = function(deltaTime){
 
   this.x += this.movementVector.x * this.speed * deltaTime;
   this.y += this.movementVector.y * this.speed * deltaTime;
-  this.tail.points[this.tail.points.length -1] = {x: this.x/3, y: this.y/3};
+  this.tail.points[this.tail.points.length -1] = {x: this.x, y: this.y};
+  this.log("player_div", {x: this.x, y: this.y});
 };
 
 Player.prototype.canMove = function(vector){
@@ -80,10 +86,9 @@ Player.prototype.canMove = function(vector){
   var x2 = vector.x;
   var y2 = vector.y;
   x = (this.graphics.sample(x1 + x2, y1 + y2));
-  var cell = this.graphics.sample(this.x, this.y+1*3);
+  player.log("vector_div", {x1: x1, y1: y1});
   this.graphics.ctx.fillStyle = "#000000";
   this.graphics.ctx.fillRect(this.x + vector.x, this.y + vector.y, 3,3);
-  debug(x);
   return(x != Board.CELLS.path);
 };
 
@@ -94,6 +99,8 @@ Player.prototype.isOnGrid = function(){
 Player.prototype.draw = function(){
   this.graphics.ctx.beginPath();
   this.graphics.ctx.strokeStyle = this.color;
-  this.graphics.ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI, false);
+  this.graphics.ctx.fillStyle = "#000";
+  this.graphics.offscreenCanvas.context.drawImage(this.graphics.canvas, 0, 0, 960, 600);
+  this.graphics.ctx.arc(this.x+1, this.y+0.5, this.size, 0, 2 * Math.PI, false);
   this.graphics.ctx.stroke();
 };
