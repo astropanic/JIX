@@ -82,5 +82,6 @@ var board = new Board(200, 160, graphics);
 var tail = new Tail(160, 199, graphics);
 var player = new Player(160*3, 199*3,graphics, tail);
 var game = new Game(graphics, board, player);
+var hud = new Hud();
 game.run();
 

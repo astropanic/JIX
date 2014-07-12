@@ -1,12 +1,53 @@
 html {
-  background-color: gray;
   width: 100%;
   text-align: center;
 }
 
+body {
+	background-color: #ccc;
+	font-family: sans-serif;
+}
+
+#game-space {
+	width: 960px;
+	margin: 0 auto;
+}
+
+#logo {
+	color: #fff;
+	font-weight: bold;
+	font-size: 24pt;
+	float: left;
+}
+
+#logo-shadow {
+	text-shadow: 1px 0 0 #000, 2px 0 0 #000, 3px 0 0 #fff, 4px 0 0 #fff, 5px 0 0 #000, 6px 0 0 #000, 7px 0 0 #fff, 8px 0 0 #fff, 9px 0 0 #000, 10px 0 0 #000;
+}
+
+#claim {
+	float: right;
+	width: 50px;
+}
+
+.sheet {
+	min-width: 50px;
+	min-height: 30px;
+	padding: 5px;
+	border: 1px solid #999;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
+	background: radial-gradient(ellipse at center, rgba(255,255,255,1) 80%, rgba(204,204,204,1) 92%, rgba(204,204,204,1) 100%);
+	box-sizing: border-box;
+	position: absolute;
+	-webkit-transform: translate(0%, 0%) rotate(0deg);
+	-webkit-transition: 1s;
+}
+
+.sheet.away {
+	-webkit-transform: translate(0%, -200%) rotate(90deg);
+}
+
 canvas {
   background-color: #6666FF;
-  margin: 0 auto;
 }
 
 #log {
@@ -17,6 +58,7 @@ canvas {
   overflow: scroll;
   margin-top: 120px;
 }
+
 .clear {
   clear: both;
 }
