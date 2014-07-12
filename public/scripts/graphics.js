@@ -2,13 +2,17 @@ var Graphics = function(){
   this.size = 3;
   this.canvas = document.getElementById("jix");
   this.ctx    = this.canvas.getContext('2d');
+  this.offscreenCanvas = document.createElement('canvas');
+  this.offscreenCanvas.width = 960;
+  this.offscreenCanvas.height = 600;
+  this.offscreenCanvas.context = this.offscreenCanvas.getContext('2d');
 };
 
 Graphics.prototype.sample = function(x, y){
-  var data  = this.ctx.getImageData(100, 200, 1, 1).data;
-  var red   = data[0];
+  var data  = this.offscreenCanvas.context.getImageData(x-1, y-1, 1, 1).data;
+  var red   = data[2];
   var green = data[1];
-  var blue  = data[2];
+  var blue  = data[0];
   return "#"+(red + 256 * green + 65536 * blue).toString(16).toUpperCase();
 };
 
