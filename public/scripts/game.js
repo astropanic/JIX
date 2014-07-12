@@ -33,10 +33,10 @@ var Game = function(graphics, board, player, hud){
 
 	// Block only arrow keys.
     switch(event.keyCode) {
-    case 37: // left
-    case 38: // up
-    case 39: // right
-    case 40: // down
+	case Key.LEFT:
+	case Key.UP:
+	case Key.RIGHT:
+	case Key.DOWN:
 	  event.preventDefault();
     }
 
