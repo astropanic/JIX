@@ -20,3 +20,8 @@ canvas {
 .clear {
   clear: both;
 }
+
+#debug {
+  width:800px;
+  height:200px;
+}
