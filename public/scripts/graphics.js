@@ -4,6 +4,15 @@ var Graphics = function(){
   this.ctx    = this.canvas.getContext('2d');
 };
 
+Graphics.prototype.sample = function(x, y){
+  var data  = this.ctx.getImageData(100, 200, 1, 1).data;
+  var red   = data[0];
+  var green = data[1];
+  var blue  = data[2];
+  return "#"+(red + 256 * green + 65536 * blue).toString(16).toUpperCase();
+};
+
+
 Graphics.prototype.line = function(x1, y1, x2, y2, color){
   this.ctx.beginPath();
   this.ctx.strokeStyle = color;
