@@ -2,7 +2,7 @@ var Hud = function(){
 	var meterEl = this._getMeterEl();
 
 	this.claim = 0;
-	this.initTime = 60;
+	this.initTime = 30;
 	this.oldMeterWidth = this.meterWidth = meterEl.offsetWidth;
 	this.meterTick = (this.meterWidth / 100) / this.initTime; // Fixme Tick has wrong time interval.
 };
@@ -46,6 +46,8 @@ Hud.prototype.updateTimer = function () {
 			this.meterWidth = 0;
 
 			this.onTimeOver();
+
+			this.updateTimer = function(){}; // Fake stop.
 		}
 
 		if (this.meterWidth >= 0) {
@@ -54,8 +56,18 @@ Hud.prototype.updateTimer = function () {
 	}
 };
 
+// This method is called when the time is over.
 Hud.prototype.onTimeOver = function(){
-	// This method is called when the time is over.
+	var claimEl = document.getElementById('claim'),
+		sheetEl = claimEl.children[0].cloneNode(true);
+
+	claimEl.appendChild(sheetEl);
+
+	// Animate
+	setTimeout(function () {
+		sheetEl.classList.add('game-over');
+	}, 100);
+
 };
 
 Hud.prototype._getMeterEl = function(){
