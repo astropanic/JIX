@@ -1,20 +1,39 @@
 var Board = function(width, height, graphics){
-  this.width = width;
-  this.height= height;
   this.graphics = graphics;
+  this.width   = width;
+  this.height  = height;
+  this.paths   = [
+    {x1: 0, y1: 0, x2: 319, y2: 20},
+    {x1: 0, y1: 0, x2: 0, y2: 199},
+    {x1: 319, y1: 0, x2: 319, y2: 199},
+    {x1: 0, y1: 199, x2: 319, y2: 199}
+  ];
+};
+
+Board.CELLS = {
+  path:  "#FFFFFF",
+  empty: "#AA0033",
+  tail:  "#00FF00"
+};
+
+Board.prototype.addPath = function(x1, y1, x2, y2){
+  this.paths.push({
+    x1: x1,
+    y1: y1,
+    x2: x2,
+    y2: y2
+  });
 };
 
 Board.prototype.draw = function(){
-  graphics.ctx.fillStyle = "AA0033";
+  graphics.ctx.fillStyle = Board.CELLS.empty;
   graphics.ctx.fillRect(0, 0, 960,600);
-  graphics.line(0,0, 319, 0, "#FFF");
-  graphics.line(0,8, 319, 20);
-  graphics.line(0, 0, 0, 199);
-  graphics.line(319, 0, 319, 199);
-  graphics.line(0, 199, 319, 199);
+  this.paths.forEach(function(path) {
+    graphics.line(path.x1, path.y1, path.x2, path.y2, Board.CELLS.path);
+  });
 };
 Board.prototype.clear = function(){
-  this.graphics.ctx.clearRect(0,0, 320*3,200*3);
+  this.graphics.ctx.clearRect(0,0, 960, 600);
 };
 
 var Game = function(graphics, board, player){

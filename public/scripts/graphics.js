@@ -5,10 +5,10 @@ var Graphics = function(){
 };
 
 Graphics.prototype.sample = function(x, y){
-  var data  = this.ctx.getImageData(100, 200, 1, 1).data;
-  var red   = data[0];
+  var data  = this.ctx.getImageData(x, y, 1, 1).data;
+  var red   = data[2];
   var green = data[1];
-  var blue  = data[2];
+  var blue  = data[0];
   return "#"+(red + 256 * green + 65536 * blue).toString(16).toUpperCase();
 };
 
