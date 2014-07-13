@@ -1,12 +1,15 @@
-var Board = function(width, height, graphics){
-  this.graphics = graphics;
+var Board = function(width, height){
   this.width   = width;
   this.height  = height;
+
+  Graphics.canvas.width  = this.width * Graphics.size;
+  Graphics.canvas.height = this.height * Graphics.size;
+
   this.paths   = [
-    {x1: 0, y1: 0, x2: 319, y2: 20},
-    {x1: 0, y1: 0, x2: 0, y2: 199},
-    {x1: 319, y1: 0, x2: 319, y2: 199},
-    {x1: 0, y1: 199, x2: 319, y2: 199}
+    {x1: 0, y1: 0, x2: this.width-1, y2: 20},
+    {x1: 0, y1: 0, x2: 0, y2: this.height-1},
+    {x1: this.width-1, y1: 0, x2: this.width-1, y2: this.height-1},
+    {x1: 0, y1: this.height-1, x2: this.width-1, y2: this.height-1}
   ];
 };
 
@@ -26,23 +29,21 @@ Board.prototype.addPath = function(x1, y1, x2, y2){
 };
 
 Board.prototype.draw = function(){
-  graphics.ctx.fillStyle = Board.CELLS.empty;
-  graphics.ctx.fillRect(0, 0, 960,600);
+  Graphics.ctx.fillStyle = Board.CELLS.empty;
+  Graphics.ctx.fillRect(0, 0, this.width * Graphics.size, this.height * Graphics.size);
   this.paths.forEach(function(path) {
-    graphics.line(path.x1, path.y1, path.x2, path.y2, Board.CELLS.path);
+    Graphics.line(path.x1, path.y1, path.x2, path.y2, Board.CELLS.path);
   });
 };
 Board.prototype.clear = function(){
-  this.graphics.ctx.clearRect(0,0, 960, 600);
+  Graphics.ctx.clearRect(0,0, 960, 600);
 };
 
-var Game = function(graphics, board, player, hud){
-  this.graphics = graphics;
+var Game = function(board, player){
   this.board = board;
   this.player = player;
-  this.hud = hud;
   this.meter = new FPSMeter({decimals: 0});
-  this.step = 0.01;
+  this.step = 0.005;
   window.addEventListener('keyup', function(event) {
     Key.onKeyup(event);
 	event.preventDefault();
@@ -69,7 +70,6 @@ Game.prototype.timestamp = function(){
 
 Game.prototype.render = function(){
   this.meter.tick();
-  this.hud.updateTimer();
   this.board.clear();
   this.board.draw();
   this.player.tail.draw();
@@ -102,19 +102,13 @@ Game.prototype.frame = function(){
       });
 };
 
-
-
 Game.prototype.run = function(){
   this.then = this.timestamp();
   this.frame();
 };
 
-var graphics = new Graphics();
-var board = new Board(200, 160, graphics);
-var tail = new Tail(160*3, 199*3, graphics);
-var player = new Player(160*3, 199*3,graphics, tail);
-var hud = new Hud();
-var game = new Game(graphics, board, player, hud);
-
+var board = new Board(80, 40);
+var player = new Player(39, 39);
+var game = new Game(board, player);
 game.run();
 

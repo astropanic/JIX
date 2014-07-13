@@ -1,106 +1,81 @@
-Array.prototype.last = function(){
-  return this[this.length - 1];
-};
-
-Array.prototype.penultimate = function(){
-  return this[this.length - 2];
-};
-
-
-var Tail = function(x, y, graphics){
-  this.graphics = graphics;
-  this.points = [{x: x, y:y}];
-};
-
-Tail.prototype.draw = function(){
-  var points = JSON.parse( JSON.stringify( this.points ) );
-  var last = points.shift();
-  points.forEach(function(el, index){
-    graphics.line(last.x/3, last.y/3, el.x/3, el.y/3, Board.CELLS.tail);
-    last = el;
-  });
-};
-var Player = function(x, y, graphics, tail){
-  this.x = x;
-  this.y = y;
-  this.size = 8;
-  this.tail = tail;
-  this.color = "#FFFF00";
-  this.graphics = graphics;
-  this.isMoving = true;
-  this.onX = true;
-  this.onY = true;
-  this.movementVector = {x: 0, y: 0};
+var Player = function(x, y){
+  this.tail = new Tail();
+  this.x = x*Graphics.size;
+  this.y = y*Graphics.size;
+  this.movementVector = { x: 0, y: 0 };
+  this.movementVectorPending = this.movementVector;
   this.directionLast = this.movementVector;
-  this.speed = 10;
-  this.tailUpdate();
-};
-
-Player.prototype.xGrid = function(){
-  Math.floor(this.x/3);
-};
-
-Player.prototype.yGrid = function(){
-  Math.floor(this.y/3);
-};
-
-Player.prototype.tailUpdate = function(){
-  this.tail.points.push({x: Math.floor(this.x), y: Math.floor(this.y)});
-};
-
-Player.prototype.log = function(id, msg){
-  var el = document.getElementById(id);
-  el.innerHTML = "<pre>" + JSON.stringify(msg) + "</pre>";
-};
-
-Player.prototype.update = function(deltaTime){
-  if(this.isOnGrid()){
-    if (Key.isDown(Key.SHIFT)) {
-      this.speed = 300;
-    } else {
-      this.speed = 100;
-    }
-    if (Key.isDown(Key.UP)) this.movementVector = {x: 0, y: -1};
-    if (Key.isDown(Key.DOWN)) this.movementVector = {x: 0, y: 1};
-    if (Key.isDown(Key.LEFT)) this.movementVector = {x: -1, y: 0};
-    if (Key.isDown(Key.RIGHT)) this.movementVector = {x: 1, y: 0};
-    if(!this.canMove(this.movementVector)){
-      this.movementVector = {x: 0, y:0};
-    }
-  }
-  this.direction = this.movementVector;
-  if (this.direction.x != this.directionLast.x){
-    this.tailUpdate();
-    this.directionLast = this.direction;
-  }
-
-  this.x += this.movementVector.x * this.speed * deltaTime;
-  this.y += this.movementVector.y * this.speed * deltaTime;
-  this.tail.points[this.tail.points.length -1] = {x: this.x, y: this.y};
-  this.log("player_div", {x: this.x, y: this.y});
 };
 
 Player.prototype.canMove = function(vector){
-  var x1 = this.x;
-  var y1 = this.y;
-  var x2 = vector.x;
-  var y2 = vector.y;
-  x = (this.graphics.sample(x1 + x2, y1 + y2));
-  player.log("vector_div", {x1: x1, y1: y1});
-  this.graphics.ctx.fillStyle = "#000000";
-  this.graphics.ctx.fillRect(this.x + vector.x, this.y + vector.y, 3,3);
-  return(x != Board.CELLS.path);
+  var cell = Graphics.sample(
+      this.x + (Graphics.size * vector.x) + Graphics.size/2,
+      this.y + (Graphics.size * vector.y) + Graphics.size/2
+  );
+  console.log(cell);
+  return cell !== "#000";
+};
+
+Player.prototype.isMoving = function(){
+  return(this.movementVector.x !== 0 || this.movementVector.y !== 0);
+};
+
+Player.prototype.readKeyboard = function(){
+  if (Key.isDown(Key.SHIFT)) {
+    this.speed = 1;
+  } else {
+    this.speed = 0.5;
+  }
+
+  if (Key.isDown(Key.UP)    && this.canMove({x:  0, y: -1})) this.movementVectorPending = {x:  0, y: -1};
+  if (Key.isDown(Key.DOWN)  && this.canMove({x:  0, y:  1})) this.movementVectorPending = {x:  0, y: 1};
+  if (Key.isDown(Key.LEFT)  && this.canMove({x: -1, y:  0})) this.movementVectorPending = {x: -1, y: 0};
+  if (Key.isDown(Key.RIGHT) && this.canMove({x:  1, y:  0})) this.movementVectorPending = {x:  1, y: 0};
+};
+
+Player.prototype.updateDirection = function() {
+  if (this.isOnGrid()){
+    if(this.isMoving()) {
+      if(this.checkNextTile() == "#000"){
+        this.movementVectorPending = {x:0, y:0};
+      }
+    }
+    this.movementVector = this.movementVectorPending;
+    this.direction = this.movementVector;
+    if ((this.direction.x != this.directionLast.x) || (this.direction.y != this.directionLast.y)){
+      this.directionLast = this.direction;
+    }
+  }
+};
+
+Player.prototype.checkNextTile = function() {
+  cell = Graphics.sample(
+      this.x + (Graphics.size * this.movementVectorPending.x) + Graphics.size/2, 
+      this.y + (Graphics.size * this.movementVectorPending.y) + Graphics.size/2
+  );
+  return cell;
+};
+
+Player.prototype.doAction = function() {
+  this.x += this.movementVector.x * this.speed;
+  this.y += this.movementVector.y * this.speed;
+};
+
+Player.prototype.update = function(deltaTime){
+  this.readKeyboard();
+  this.updateDirection();
+  this.doAction();
+
+
 };
 
 Player.prototype.isOnGrid = function(){
-  return ((Math.floor(this.x) % 3) === 0) && ((Math.floor(this.y) % 3) === 0);
+  var tmp = (((this.x % Graphics.size) === 0) && (this.y % Graphics.size) === 0);
+  return tmp;
 };
 
 Player.prototype.draw = function(){
-  this.graphics.ctx.beginPath();
-  this.graphics.ctx.strokeStyle = this.color;
-  this.graphics.ctx.fillStyle = "#000";
-  this.graphics.offscreenCanvas.context.drawImage(this.graphics.canvas, 0, 0, 960, 600);
-  this.graphics.ctx.arc(this.x+1, this.y+0.5, this.size, 0, 2 * Math.PI, false);
-  this.graphics.ctx.stroke();
+  Graphics.ctx.beginPath();
+  Graphics.ctx.fillStyle = "#000000";
+  Graphics.ctx.fillRect(this.x, this.y, Graphics.size, Graphics.size);
 };
