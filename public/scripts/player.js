@@ -1,10 +1,21 @@
 var Player = function(x, y){
+  this.color = "#000000";
   this.tail = new Tail();
   this.x = x*Graphics.size;
   this.y = y*Graphics.size;
+  this.gridLast = Board.CELLS.path;
+  this.gridCurrent = Board.CELLS.path;
   this.movementVector = { x: 0, y: 0 };
   this.movementVectorPending = this.movementVector;
   this.directionLast = this.movementVector;
+};
+
+Player.prototype.setGrid = function (key){
+  this.gridCurrent = key;
+  if(this.gridLast != this.gridCurrent) {
+    this.color = "#FF0000";
+    this.gridLast = this.gridCurrent;
+  }
 };
 
 Player.prototype.canMove = function(vector){
@@ -53,6 +64,7 @@ Player.prototype.checkNextTile = function() {
       this.x + (Graphics.size * this.movementVectorPending.x) + Graphics.size/2, 
       this.y + (Graphics.size * this.movementVectorPending.y) + Graphics.size/2
   );
+  this.setGrid(cell);
   return cell;
 };
 
@@ -66,7 +78,6 @@ Player.prototype.update = function(deltaTime){
   this.updateDirection();
   this.doAction();
 
-
 };
 
 Player.prototype.isOnGrid = function(){
@@ -76,6 +87,6 @@ Player.prototype.isOnGrid = function(){
 
 Player.prototype.draw = function(){
   Graphics.ctx.beginPath();
-  Graphics.ctx.fillStyle = "#000000";
+  Graphics.ctx.fillStyle = this.color;
   Graphics.ctx.fillRect(this.x, this.y, Graphics.size, Graphics.size);
 };
